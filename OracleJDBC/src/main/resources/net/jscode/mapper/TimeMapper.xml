@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- xml를 활용한 공통코드 -->
+<!-- 관련된 인터페이스 기술 -->
+<mapper namespace="net.jscode.mapper.TimeMapper">
+<!-- sql용 코드 삽입 id : 메서드명과 일치(대소문자 구분) resultType : 리턴타입과 일치(대소문자 구분 없음)-->
+<select id="getTimeXML" resultType="string">
+select sysdate from dual
+</select>
+</mapper>
