@@ -16,8 +16,8 @@
 		<!-- Spring -->
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-context</artifactId>
-			<version>${org.springframework-version}</version>
+			<artifactId>spring-context</artifactId> <!-- Spring 메모리 영역-->
+			<version>${org.springframework-version}</version> <!-- properties의 버전을 따른다.-->
 			<exclusions>
 				<!-- Exclude Commons Logging in favor of SLF4j -->
 				<exclusion>
@@ -37,16 +37,21 @@
 			<artifactId>spring-test</artifactId>
 			<version>${org.springframework-version}</version>
 		</dependency>
+		<!-- test 폴더 필수 코드  @Test -> Junit 메서드별 테스트
+		@RunWith(SpringJUnit4ClassRunner.class)
+		@ContextConfiguration("file:src/main/webapp/WEB-INF/spring/root-context.xml")
+		@Log4j2
+		-->
 
 		<!-- lombok 설정 추가(dto 객체 자동화) -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.34</version>
+			<version>1.18.24</version>
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- jdbc 세팅 1. 드라이버 2. 커넥션풀(HikariCP) 3. mybatis 4.log4jdbc -->
+		<!-- jdbc 세팅 1. 드라이버 2. 커넥션풀(HikariCP) 3. mybatis(Preparestatememt 대신) 4.log4jdbc -->
 		<!-- https://mvnrepository.com/artifact/com.oracle.database.jdbc/ojdbc8 -->
 		<dependency>
 			<groupId>com.oracle.database.jdbc</groupId>
@@ -78,7 +83,7 @@
 		</bean>
 		
 		-->
-
+		<!--마이바티스 매핑용 코드-->
 		<!-- 마이바티스 : jdbc 연동용 https://mvnrepository.com/artifact/org.mybatis/mybatis -->
 		<dependency>
 			<groupId>org.mybatis</groupId>
@@ -92,6 +97,16 @@
 			<artifactId>mybatis-spring</artifactId>
 			<version>1.3.3</version>
 		</dependency>
+
+		<!-- root-context.xml 코드 변경  
+		<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+			<property name="dataSource" ref="dataSource"></property>
+		</bean>
+	
+		<mybatis-spring:scan base-package="org.zerock.mapper"/>  -> 매핑용 인터페이스 위치
+		-> sql처리를 mapper에서 찾는다. ->인터페이스 + xml로 sql 처리함
+				
+		-->
 
 		<!-- 스프링 트랜젝션 처리용 https://mvnrepository.com/artifact/org.springframework/spring-tx -->
 		<dependency>
@@ -107,15 +122,7 @@
 			<version>${org.springframework-version}</version>
 		</dependency>
 
-		<!-- root-context.xml 코드 변경  
-		<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-			<property name="dataSource" ref="dataSource"></property>
-		</bean>
-	
-		<mybatis-spring:scan base-package="org.zerock.mapper"/> 
-		sql처리를 mapper에서 찾는다. 
-				
-		-->
+
 		<!-- 로그출력을 표형식으로 구현 https://mvnrepository.com/artifact/org.bgee.log4jdbc-log4j2/log4jdbc-log4j2-jdbc4.1 -->
 		<dependency>
 			<groupId>org.bgee.log4jdbc-log4j2</groupId>
@@ -123,14 +130,18 @@
 			<version>1.16</version>
 		</dependency>
 
-		<!-- AspectJ -->
+		<!--root-context.xml 코드 변경  (기존 코드 변경)
+		<property name="driverClassName" value="net.sf.log4jdbc.sql.jdbcapi.DriverSpy"></property> 
+		<property name="jdbcUrl" value="jdbc:log4jdbc:oracle:thin:@localhost:1521:XE"></property> -->
+
+		<!-- AspectJ : AOP 관련 설정, p.445-->
 		<dependency>
 			<groupId>org.aspectj</groupId>
 			<artifactId>aspectjrt</artifactId>
 			<version>${org.aspectj-version}</version>
 		</dependency>
 
-		<!-- Logging 
+		<!-- Logging : 구형 Log4 버전 사용 안한 -> 하단에 Log4j2 추가
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
@@ -213,12 +224,14 @@
 			<scope>provided</scope>
 		</dependency>
 
+		<!-- 프론트를 jsp로 사용 -->
 		<dependency>
 			<groupId>javax.servlet.jsp</groupId>
 			<artifactId>jsp-api</artifactId>
 			<version>2.1</version>
 			<scope>provided</scope>
 		</dependency>
+		<!-- jstl용 jar 파일 주입 -->
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>jstl</artifactId>
@@ -226,13 +239,44 @@
 		</dependency>
 
 		<!-- Test -->
+		<!-- Test 폴더에서 메서드 별로 테스팅이 됨-->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.12</version>
+			<version>4.12</version> <!-- 4.7을 4.12 버전으로 향상 -->
 			<scope>test</scope>
 		</dependency>
+		<!-- Jackson databind : 컨트롤러에서 처리된 결과를 JSON 타입으로 프론트에게 보냄 -->
+		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.9.4</version>
+		</dependency>
+		<!-- commons-fileupload : 파일업로드용 코드 -->
+		<!-- https://mvnrepository.com/artifact/commons-fileupload/commons-fileupload -->
+		<dependency>
+			<groupId>commons-fileupload</groupId>
+			<artifactId>commons-fileupload</artifactId>
+			<version>1.3.3</version>
+		</dependency>
 	</dependencies>
+	
+	<!--servlet-context.xml에 필수로 추가할 것
+	<beans:bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<beans:property name="defaultEncoding" value="utf-8"></beans:property>
+		
+		1024 * 1024 * 10 bytes 10MB 
+		<beans:property name="maxUploadSize" value="104857560"></beans:property>
+		
+		1024 * 1024 * 2 bytes 2MB 
+		<beans:property name="maxUploadSizePerFile"	value="2097152"></beans:property>
+		<beans:property name="uploadTempDir" value="file:/D:/upload/tmp"></beans:property>
+		<beans:property name="maxInMemorySize" value="10485756"></beans:property>
+	</beans:bean>  -->
+
+	<!-- maven-> update Projec 기능 사용-->
 	<build>
 		<plugins>
 			<plugin>
@@ -252,10 +296,10 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.5.1</version>
+				<version>3.5.1</version> <!--2.5.1 버전을 3.5.1 버전으로 향상-->
 				<configuration>
-					<source>11</source>
-					<target>11</target>
+					<source>11</source> <!--jdk 버전 11 로 향상-->
+					<target>11</target> <!--jdk 버전 11 로 향상-->
 					<compilerArgument>-Xlint:all</compilerArgument>
 					<showWarnings>true</showWarnings>
 					<showDeprecation>true</showDeprecation>
